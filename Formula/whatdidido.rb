@@ -13,7 +13,6 @@ class Whatdidido < Formula
     # Create virtualenv and install package with all dependencies using pip
     # This allows pip to use binary wheels for faster installation
     virtualenv_create(libexec, "python3.12")
-    system libexec/"bin/pip", "install", "-v", "--no-deps", buildpath
     system libexec/"bin/pip", "install", "-v", buildpath
     bin.install_symlink libexec/"bin/whatdidido"
   end
