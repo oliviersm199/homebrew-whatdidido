@@ -10,18 +10,6 @@ class Whatdidido < Formula
   depends_on "python@3.12"
 
   def install
-    # Create virtualenv and install package with all dependencies using pip
-    # This allows pip to use binary wheels for faster installation
-    virtualenv_create(libexec, "python3.12")
-    # Install pip into the virtualenv first
-    system libexec/"bin/python", "-m", "ensurepip"
-    system libexec/"bin/pip", "install", "--upgrade", "pip"
-    # Install the package with all dependencies
-    system libexec/"bin/pip", "install", "-v", buildpath
-    bin.install_symlink libexec/"bin/whatdidido"
-  end
-
-  test do
-    assert_match "whatdidido", shell_output("#{bin}/whatdidido --help")
+    virtualenv_install_with_resources
   end
 end
