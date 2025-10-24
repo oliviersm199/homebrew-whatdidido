@@ -24,10 +24,6 @@ class Whatdidido < Formula
     sha256 "47c09d31ccf2acf0be3f701ea53595ee7e0b8fa08801c6624be771df09ae7b43"
   end
 
-  resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/13/69/33ddede1939fdd074bce5434295f38fae7136463422fe4fd3e0e89b98062/charset_normalizer-3.4.4.tar.gz"
-    sha256 "94537985111c35f28720e43603b8e7b43a6ecfb2ce1d3058bbe955b73404e21a"
-  end
 
   resource "click" do
     url "https://files.pythonhosted.org/packages/46/61/de6cd827efad202d7057d93e0fed9294b96952e188f7384832791c7b2254/click-8.3.0.tar.gz"
@@ -74,10 +70,6 @@ class Whatdidido < Formula
     sha256 "2d09ae3bf4741a2787dd889dfea5926a5d509aac3b28ab3b98c098709e6ee72d"
   end
 
-  resource "jiter" do
-    url "https://files.pythonhosted.org/packages/a3/68/0357982493a7b20925aece061f7fb7a2678e3b232f8d73a6edb7e5304443/jiter-0.11.1.tar.gz"
-    sha256 "849dcfc76481c0ea0099391235b7ca97d7279e0fa4c86005457ac7c88e8b76dc"
-  end
 
   resource "markdown-it-py" do
     url "https://files.pythonhosted.org/packages/5b/f5/4ec618ed16cc4f8fb3b701563655a69816155e79e24a17b651541804721d/markdown_it_py-4.0.0.tar.gz"
@@ -114,10 +106,6 @@ class Whatdidido < Formula
     sha256 "1da1c82b0fc140bb0103bc1441ffe062154c8d38491189751ee00fd8ca65ce74"
   end
 
-  resource "pydantic_core" do
-    url "https://files.pythonhosted.org/packages/df/18/d0944e8eaaa3efd0a91b0f1fc537d3be55ad35091b6a87638211ba691964/pydantic_core-2.41.4.tar.gz"
-    sha256 "70e47929a9d4a1905a67e4b687d5946026390568a8e952b92824118063cee4d5"
-  end
 
   resource "Pygments" do
     url "https://files.pythonhosted.org/packages/b0/77/a5b8c569bf593b0140bde72ea885a803b82086995367bf2037de0159d924/pygments-2.19.2.tar.gz"
@@ -139,10 +127,6 @@ class Whatdidido < Formula
     sha256 "3d7e980292bb0107abaa79c68dd3eee3c561b83a0f89ae482860b181c8bd412d"
   end
 
-  resource "regex" do
-    url "https://files.pythonhosted.org/packages/f8/c8/1d2160d36b11fbe0a61acb7c3c81ab032d9ec8ad888ac9e0a61b85ab99dd/regex-2025.10.23.tar.gz"
-    sha256 "8cbaf8ceb88f96ae2356d01b9adf5e6306fa42fa6f7eab6b97794e37c959ac26"
-  end
 
   resource "requests" do
     url "https://files.pythonhosted.org/packages/c9/74/b3ff8e6c8446842c3f5c837e9c3dfcfe2018ea6ecef224c710c85ef728f4/requests-2.32.5.tar.gz"
@@ -169,10 +153,6 @@ class Whatdidido < Formula
     sha256 "f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"
   end
 
-  resource "tiktoken" do
-    url "https://files.pythonhosted.org/packages/7d/ab/4d017d0f76ec3171d469d80fc03dfbb4e48a4bcaddaa831b31d526f05edc/tiktoken-0.12.0.tar.gz"
-    sha256 "b18ba7ee2b093863978fcb14f74b3707cdc8d4d4d3836853ce7ec60772139931"
-  end
 
   resource "tqdm" do
     url "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz"
@@ -200,8 +180,8 @@ class Whatdidido < Formula
   end
 
   def install
-    # Allow binary wheels for packages with Rust/C extensions to avoid lengthy compilation
-    ENV["PIP_ONLY_BINARY"] = "charset-normalizer,jiter,pydantic-core,regex,tiktoken"
+    # Install Rust/C extension packages from binary wheels (not listed as resources above)
+    # to avoid requiring Rust toolchain and lengthy compilation times
     virtualenv_install_with_resources
   end
 
