@@ -8,6 +8,7 @@ class Whatdidido < Formula
   license "MIT"
 
   depends_on "python@3.12"
+  depends_on "rust" => :build
 
   def install
     virtualenv_install_with_resources
