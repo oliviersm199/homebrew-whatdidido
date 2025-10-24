@@ -11,6 +11,9 @@ on:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout tap repository
         uses: actions/checkout@v4
