@@ -201,7 +201,8 @@ class Whatdidido < Formula
   end
 
   def install
-    # Allow binary wheels for packages that require Rust to build
+    # Allow binary wheels for packages with Rust/C extensions
+    ENV["PIP_ONLY_BINARY"] = "jiter,pydantic_core,tiktoken,charset-normalizer"
     virtualenv_install_with_resources(using: "python@3.12", link_manpages: false)
   end
 
