@@ -1,0 +1,46 @@
+name: Update Homebrew Formula
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version number (e.g., 0.1.4)'
+        required: true
+        type: string
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download and hash new version
+        id: hash
+        run: |
+          VERSION="${{ inputs.version }}"
+          curl -sL "https://files.pythonhosted.org/packages/source/w/whatdidido/whatdidido-${VERSION}.tar.gz" -o package.tar.gz
+          SHA256=$(shasum -a 256 package.tar.gz | awk '{print $1}')
+          echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update formula
+        run: |
+          VERSION="${{ steps.hash.outputs.version }}"
+          SHA256="${{ steps.hash.outputs.sha256 }}"
+
+          sed -i "s|whatdidido-[0-9]\+\.[0-9]\+\.[0-9]\+\.tar\.gz|whatdidido-${VERSION}.tar.gz|g" Formula/whatdidido.rb
+          sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|g" Formula/whatdidido.rb
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "Update whatdidido to v${{ steps.hash.outputs.version }}"
+          title: "Update whatdidido to v${{ steps.hash.outputs.version }}"
+          body: |
+            Updates the Homebrew formula for whatdidido to version ${{ steps.hash.outputs.version }}
+
+            - Version: ${{ steps.hash.outputs.version }}
+            - SHA256: ${{ steps.hash.outputs.sha256 }}
+          branch: update-v${{ steps.hash.outputs.version }}
+          delete-branch: true

@@ -1,0 +1,97 @@
+name: Auto-Update Homebrew Formula
+
+on:
+  schedule:
+    # Check for new releases daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [version-update]
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+
+      - name: Get latest PyPI version
+        id: pypi
+        run: |
+          LATEST_VERSION=$(curl -s https://pypi.org/pypi/whatdidido/json | jq -r '.info.version')
+          echo "version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
+          echo "Latest PyPI version: ${LATEST_VERSION}"
+
+      - name: Get current formula version
+        id: formula
+        run: |
+          CURRENT_VERSION=$(grep -oP 'whatdidido-\K[0-9]+\.[0-9]+\.[0-9]+' Formula/whatdidido.rb)
+          echo "version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          echo "Current formula version: ${CURRENT_VERSION}"
+
+      - name: Check if update needed
+        id: check
+        run: |
+          if [ "${{ steps.pypi.outputs.version }}" != "${{ steps.formula.outputs.version }}" ]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "Update needed: ${{ steps.formula.outputs.version }} -> ${{ steps.pypi.outputs.version }}"
+          else
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+            echo "No update needed, already on latest version"
+          fi
+
+      - name: Download and hash new version
+        if: steps.check.outputs.needs_update == 'true'
+        id: hash
+        run: |
+          VERSION="${{ steps.pypi.outputs.version }}"
+          URL="https://files.pythonhosted.org/packages/source/w/whatdidido/whatdidido-${VERSION}.tar.gz"
+
+          echo "Downloading from: ${URL}"
+          curl -sL "${URL}" -o package.tar.gz
+
+          if [ ! -f package.tar.gz ]; then
+            echo "Failed to download package"
+            exit 1
+          fi
+
+          SHA256=$(shasum -a 256 package.tar.gz | awk '{print $1}')
+          echo "sha256=${SHA256}" >> $GITHUB_OUTPUT
+          echo "Calculated SHA256: ${SHA256}"
+
+      - name: Update formula
+        if: steps.check.outputs.needs_update == 'true'
+        run: |
+          VERSION="${{ steps.pypi.outputs.version }}"
+          SHA256="${{ steps.hash.outputs.sha256 }}"
+
+          # Update version in URL
+          sed -i "s|whatdidido-[0-9]\+\.[0-9]\+\.[0-9]\+\.tar\.gz|whatdidido-${VERSION}.tar.gz|g" Formula/whatdidido.rb
+
+          # Update SHA256
+          sed -i "s|sha256 \".*\"|sha256 \"${SHA256}\"|g" Formula/whatdidido.rb
+
+          echo "Formula updated successfully"
+          cat Formula/whatdidido.rb
+
+      - name: Create Pull Request
+        if: steps.check.outputs.needs_update == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update whatdidido to v${{ steps.pypi.outputs.version }}"
+          title: "Update whatdidido to v${{ steps.pypi.outputs.version }}"
+          body: |
+            Automated update of the Homebrew formula for whatdidido.
+
+            **Changes:**
+            - Version: ${{ steps.formula.outputs.version }} → ${{ steps.pypi.outputs.version }}
+            - SHA256: `${{ steps.hash.outputs.sha256 }}`
+            - PyPI URL: https://pypi.org/project/whatdidido/${{ steps.pypi.outputs.version }}/
+
+            This PR was automatically created by the auto-update workflow.
+          branch: auto-update-v${{ steps.pypi.outputs.version }}
+          delete-branch: true
+          labels: |
+            automated
+            version-update
