@@ -11,6 +11,7 @@ class Whatdidido < Formula
   depends_on "rust" => :build
 
   def install
+    ENV["PIP_PREFER_BINARY"] = "1"
     virtualenv_install_with_resources
   end
 end
