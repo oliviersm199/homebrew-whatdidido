@@ -11,10 +11,8 @@ class Whatdidido < Formula
   depends_on "rust" => :build
 
   def install
-    venv = virtualenv_create(libexec, "python3.12")
-    system libexec/"bin/pip", "install", "--only-binary", ":all:", 
-          "--upgrade", "pip", "wheel"
-    system libexec/"bin/pip", "install", buildpath
-    bin.install_symlink libexec/"bin/whatdidido"
+    # Set environment variable to prefer binary packages
+    ENV["PIP_PREFER_BINARY"] = "1"
+    virtualenv_install_with_resources
   end
 end
