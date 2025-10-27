@@ -3,8 +3,8 @@ class Whatdidido < Formula
 
   desc "Track your work across Jira and Linear with AI-powered summaries"
   homepage "https://github.com/oliviersm199/whatdididoagain"
-  url "https://files.pythonhosted.org/packages/bb/f5/07632313f28d4f612b48d4bda09f0b75cc5aa447a72f140955e06d1213ee/whatdidido-0.1.3.tar.gz"
-  sha256 "d111dd6598e6c8b31f156cfaea0f70981342837ff64c6bd74721e7589b5b2849"
+  url "https://files.pythonhosted.org/packages/bb/f5/07632313f28d4f612b48d4bda09f0b75cc5aa447a72f140955e06d1213ee/whatdidido-0.1.6.tar.gz"
+  sha256 "5572c67152af1ae46a517c5b39ace41dc28ee45a5161ce002d7a7a13bafd1fb0"
   license "MIT"
 
   depends_on "python@3.12"
